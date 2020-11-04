@@ -95,13 +95,14 @@ for (i in 1:CID) {
 t <- s[[i]][["r.squared"]]
 r.2[i,1] <-t
 }
+export.r2 <- r.2
 ggplot(r.2, aes(x = seq(1, length(V1)),y=V1))+
   geom_line()+
   geom_point()+
   xlab("Tel no") +ylab(expression(paste(R^{2}," ", "Değeri")))+
   theme_bw(base_size = 20)
 ggsave("./Data/Results/poly_r2.png")
-
+write.csv(x = export.r2, file = "./Data/Results/poly_r2.txt", quote = F, row.names = F)
 sprintf("Processing time %.2f second", (proc.time()-time)[3])
 
 
