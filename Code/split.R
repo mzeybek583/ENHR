@@ -43,8 +43,8 @@ fr <- frNN(df, eps, search = "kdtree")
 # Compute DBSCAN using fpc package
 #library("fpc")
 
-#cl <- fpc::dbscan(df, eps = 0.15, MinPts = 300)
-cl <- dbscan::dbscan(fr, minPts = 50)
+#cl <- dbscan::dbscan(df, eps = 0.2, minPts = 7)
+cl <- dbscan::dbscan(fr, minPts = 7)
 
 cl
 i=1
