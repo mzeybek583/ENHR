@@ -5,43 +5,61 @@
 # Artvin Coruh University
 
 
-
 # Load Libraries ----------------------------------------------------------
 
 
 library(lidR)
+library(dbscan)
+
+
+# Load PCL Data -----------------------------------------------------------
+
 
 las <- readLAS(files = "./Data/cross_section_data.las")
 
-# Overwrite the CRS (but does not reproject)
-crs <- sp::CRS("+init=EPSG:5255")
+crs <- sp::CRS("+init=EPSG:5255")# Overwrite the CRS (but does not reproject)
+
 projection(las) <- crs
 sf::st_crs(las)$input
-plot(las)
+
+#plot(las)
 
 las.enh = filter_poi(las, Classification == 14L)
 
-plot(las.enh)
-
+#plot(las.enh)
 
 df <- data.frame(x=las.enh@data$X, y=las.enh@data$Y, z=las.enh@data$Z) 
 
-library(dbscan)
-
+#Calculate and plot the k-Nearest Neighbor Distance
 kNNdistplot(df, k = 6)
-abline(h=.2, col = "red", lty=2)
+abline(h=.15, col = "red", lty=2)
 
+# Parameters for DBSCAN
 eps=.15
 
-minpts = 100
 
-fr <- frNN(df, eps)
+fr <- frNN(df, eps, search = "kdtree")
 
-cl <- dbscan(fr, minpts)
+# Compute DBSCAN using fpc package
+#library("fpc")
+
+#cl <- fpc::dbscan(df, eps = 0.15, MinPts = 300)
+cl <- dbscan::dbscan(fr, minPts = 50)
+
 cl
+i=1
+#### renumbering require!!
+for (i in 1:length(unique(cl$cluster))) {
+  print(i)
+  cl2 <- cl$cluster[cl$cluster == i]
+  if (length(cl2) <= 300 ) {
+    cl$cluster[cl$cluster == i] <- 0
+  }
+}
 
+# Plot --------------------------------------------------------------------
 ## plot clusters and add noise (cluster 0) as crosses.
-plot(df$y, df$z, col=cl$cluster)
+plot(df$x, df$y, col=cl$cluster, cex=0.1, xlab="Y", ylab="X")
 points(df[cl$cluster==0,], pch = 3, col = "red")
 
 class <- cl$cluster
@@ -49,7 +67,5 @@ df.out <- data.frame(X=df$x, Y=df$y, Z=df$z, Classification=class)
 
 
 # Write to file -----------------------------------------------------------
-
-
 dir.create(file.path("Data/", "Results"), showWarnings = FALSE)
-write.csv(df.out, "./Data/Results/dbscan.out.csv")
+write.csv(df.out, "./Data/Results/dbscan.out.txt")
