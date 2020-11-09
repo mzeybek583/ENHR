@@ -14,20 +14,18 @@
   #Time
   time <- proc.time()
   
-  df <- read.csv(file = "Data/Results/dbscan.out.txt")[,2:5]
+  df <- read.csv(file = "Data/Results/dbscan.out.txt")[2:5]
   
-  CID <- length(unique(df$Classification))
-  CID
-  st <- unique(df$Classification)[-1]
-  st
-  CID <- length(st)
+  CID <- unique(df$Classification)
+  
+  CID <- length(CID)-1
   
   CID
   
   out <- list()
   #i=20
-  i=11
-  for (i in st[1]:max(st)) {
+  i=28
+  for (i in 1:CID) {
     print(i)
     ind <- df$Classification==i
     df.fit <- df[ind,]
@@ -72,6 +70,7 @@
     }
   }
   out <- out[!sapply(out,is.null)]  
+  CID <- length(out)
   
   s <- list()
   for (i in 1: CID) {
@@ -84,7 +83,7 @@
   
   summary(out[[16]])
   par(mfrow = c(2,2))
-  plot(out[[16]])
+  plot(out[[28]])
   par(mfrow=c(1,1))
   
   confint(out[[16]], level=0.95)
@@ -95,7 +94,7 @@
   t <- s[[i]][["r.squared"]]
   r.2[i,1] <-t
   }
-  export.r2 <- r.2
+   export.r2 <- r.2
   ggplot(r.2, aes(x = seq(1, length(V1)),y=V1))+
     geom_line()+
     geom_point()+

@@ -6,7 +6,7 @@
 
 #
 # Load libraries ----------------------------------------------------------
-library(splines) 
+library(splines)
 library(ggplot2)
 library(MASS)
 
@@ -16,18 +16,16 @@ time <- proc.time()
 
 df <- read.csv(file = "Data/Results/dbscan.out.txt")[,2:5]
 
-CID <- length(unique(df$Classification))
-CID
-st <- unique(df$Classification)[-1]
-st
-CID <- length(st)
+CID <- unique(df$Classification)
+
+CID <- length(CID)-1
 
 CID
 
 out <- list()
 #i=20
-i=1
-for (i in st[1]:max(st)) {
+i=28
+for (i in 1:CID) {
   print(i)
   ind <- df$Classification==i
   df.fit <- df[ind,]
@@ -75,6 +73,7 @@ for (i in st[1]:max(st)) {
   }
 }
 out <- out[!sapply(out,is.null)]  
+CID <- length(out)
 
 s <- list()
 for (i in 1: CID) {
